@@ -11,29 +11,12 @@ def main():
 		"Paste a piece of text below and the app will show a simple AI/Human probability estimate."
 	)
 
-	# Option: method selection
-	method = st.radio("Model method", ["TF-IDF + Stylometry", "Transformer embeddings + Stylometry"])
-	use_transformer = method == "Transformer embeddings + Stylometry"
-
 	# Language selection (Auto / English / Chinese)
 	language_choice = st.selectbox("Input language", ["Auto", "English", "Chinese"], index=0)
 	language = "auto" if language_choice == "Auto" else ("zh" if language_choice == "Chinese" else "en")
-	# GPT-2 perplexity info
-	if _HAS_TRANSFORMERS:
-		use_ppl = st.checkbox("Include GPT-2 perplexity feature (requires transformers)", value=False)
-	else:
-		use_ppl = False
-		st.info("Install 'transformers' to enable GPT-2 perplexity feature (optional).")
-
-	# Show helpful hints for Chinese support
-	if language == "zh":
-		if not (_HAS_SB or _HAS_JIEBA):
-			st.warning("Chinese input is supported best with the 'Transformer embeddings' method or if you install 'jieba'. Consider enabling 'Transformer embeddings' or install 'jieba' (pip install jieba).")
-		if use_transformer and not _HAS_SB:
-			st.info("To use Transformer embeddings you should install 'sentence-transformers' (pip install sentence-transformers).")
 
 	# Load model (or train if missing). Use persisted model when available.
-	model, report, cm = build_and_train_model(use_perplexity=use_ppl, use_transformer=use_transformer, language=language)
+	model, report, cm = build_and_train_model(use_perplexity=False, use_transformer=False, language=language)
 
 	# bind the text area to session state so buttons can update it without rerun
 	text_input = st.text_area("Input text", height=200, key="input_text")
